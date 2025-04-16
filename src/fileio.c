@@ -13,6 +13,11 @@
 
 #include "vim.h"
 
+#ifdef __COSMOPOLITAN__
+#define _COSMO_SOURCE
+#include "libc/dce.h"
+#endif
+
 #if defined(__TANDEM)
 # include <limits.h>		// for SSIZE_MAX
 #endif
@@ -5326,7 +5331,6 @@ vim_tempname(
 #ifdef TEMPDIRNAMES
 #ifdef __COSMOPOLITAN__
     if (IsWindows())
-	char *__get_tmpdir();
 	static char *(tempdirs[]) = {__get_tmpdir()};
     else
 	static char *(tempdirs[]) = {TEMPDIRNAMES};
