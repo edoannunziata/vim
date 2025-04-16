@@ -16,6 +16,7 @@
 #ifdef __COSMOPOLITAN__
 #define _COSMO_SOURCE
 #include "libc/dce.h"
+#include "libc/runtime/runtime.h"
 #endif
 
 #if defined(__TANDEM)
