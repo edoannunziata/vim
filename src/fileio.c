@@ -13,6 +13,11 @@
 
 #include "vim.h"
 
+#ifdef __COSMOPOLITAN__
+#define _COSMO_SOURCE
+#include "libc/dce.h"
+#endif
+
 #if defined(__TANDEM)
 # include <limits.h>		// for SSIZE_MAX
 #endif
@@ -5325,12 +5330,14 @@ vim_tempname(
 
 #ifdef TEMPDIRNAMES
     static char	*(tempdirs[]) = {TEMPDIRNAMES};
-#endif
     int		i;
 # ifndef EEXIST
     stat_T	st;
 # endif
 
+#ifdef __COSMOPOLITAN__
+    tempdirs = {__get_tmpdir()};
+#endif
     /*
      * This will create a directory for private use by this instance of Vim.
      * This is done once, and the same directory is used for all temp files.
