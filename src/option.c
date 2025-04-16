@@ -89,38 +89,65 @@ static void didset_options_sctx(int opt_flags, char **buf);
     static void
 set_init_default_shell(void)
 {
-    char_u	*p;
+    char_u      *p;
 
     // Find default value for 'shell' option.
     // Don't use it if it is empty.
-    if (((p = mch_getenv((char_u *)"SHELL")) != NULL && *p != NUL)
-#if defined(MSWIN)
-	    || ((p = mch_getenv((char_u *)"COMSPEC")) != NULL && *p != NUL)
-	    || ((p = (char_u *)default_shell()) != NULL && *p != NUL)
+    if (((p = mch_getenv((char_u *)"SHELL")) != NULL && *p != NUL) 
+#if defined(__COSMOPOLITAN__)
+            || (
+                (IsWindows()) && (
+                       ((p = mch_getenv((char_u *)"COMSPEC")) != NULL && *p != NUL)
+                    || ((p = (char_u *)"cmd.exe") != NULL && *p != NUL)
+                )
+            )
+#elif defined(MSWIN)
+            || ((p = mch_getenv((char_u *)"COMSPEC")) != NULL && *p != NUL)
+            || ((p = (char_u *)default_shell()) != NULL && *p != NUL)
 #endif
-	    )
-#if defined(MSWIN)
+            )
+#if defined(__COSMOPOLITAN__)
     {
-	// For MS-Windows put the path in quotes instead of escaping spaces.
-	char_u	    *cmd;
-	size_t	    len;
-
-	if (vim_strchr(p, ' ') != NULL)
+        if (IsWindows())
 	{
-	    len = STRLEN(p) + 3;  // two quotes and a trailing NUL
-	    cmd = alloc(len);
-	    if (cmd != NULL)
-	    {
-		vim_snprintf((char *)cmd, len, "\"%s\"", p);
-		set_string_default("sh", cmd);
-		vim_free(cmd);
-	    }
-	}
-	else
-	    set_string_default("sh", p);
+            // For MS-Windows invoke the shell inside conhost.exe
+            char_u          *cmd;
+            size_t          len;
+
+            len = STRLEN(p) + 26;  // two quotes and a trailing NUL
+            cmd = alloc(len);
+            if (cmd != NULL)
+            {
+                vim_snprintf((char *)cmd, len, "conhost.exe --headless \"%s\"", p);
+                set_string_default("sh", cmd);
+                vim_free(cmd);
+            }
+        }
+        else
+            set_string_default_esc("sh", p, TRUE);
+    }
+#elif defined(MSWIN) 
+    {
+        // For MS-Windows put the path in quotes instead of escaping spaces.
+        char_u      *cmd;
+        size_t      len;
+
+        if (vim_strchr(p, ' ') != NULL)
+        {
+            len = STRLEN(p) + 3;  // two quotes and a trailing NUL
+            cmd = alloc(len);
+            if (cmd != NULL)
+            {
+                vim_snprintf((char *)cmd, len, "\"%s\"", p);
+                set_string_default("sh", cmd);
+                vim_free(cmd);
+            }
+        }
+        else
+            set_string_default("sh", p);
     }
 #else
-	set_string_default_esc("sh", p, TRUE);
+        set_string_default_esc("sh", p, TRUE);
 #endif
 }
 

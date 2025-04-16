@@ -10,6 +10,11 @@
  * optiondefs.h: option definitions
  */
 
+#ifdef __COSMOPOLITAN__
+#define _COSMO_SOURCE
+#include "libc/dce.h"
+#endif
+
 // The options that are local to a window or buffer have "indir" set to one of
 // these values.  Special values:
 // PV_NONE: global option.
@@ -2246,7 +2251,9 @@ static struct vimoption options[] =
 #ifdef VMS
 			    (char_u *)"-",
 #else
-# if defined(MSWIN)
+# if defined(__COSMOPOLITAN__)
+			    (IsWindows()) ? (char_u *)"" : (char_u *)"sh",
+# elif defined(MSWIN)
 			    (char_u *)"",	// set in set_init_1()
 # else
 			    (char_u *)"sh",
@@ -2256,7 +2263,9 @@ static struct vimoption options[] =
     {"shellcmdflag","shcf", P_STRING|P_VI_DEF|P_SECURE,
 			    (char_u *)&p_shcf, PV_NONE, NULL, NULL,
 			    {
-#if defined(MSWIN)
+#if defined(__COSMOPOLITAN__)
+			    (IsWindows()) ? (char_u *)"/c" : (char_u *)"-c",
+#elif defined(MSWIN)
 			    (char_u *)"/c",
 #else
 			    (char_u *)"-c",

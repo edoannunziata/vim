@@ -5324,7 +5324,12 @@ vim_tempname(
 #endif
 
 #ifdef TEMPDIRNAMES
+#ifdef __COSMOPOLITAN__
+    char *__get_tmpdir();
+    static char *(tempdirs[]) = {__get_tmpdir()};
+#else
     static char	*(tempdirs[]) = {TEMPDIRNAMES};
+#endif
     int		i;
 # ifndef EEXIST
     stat_T	st;

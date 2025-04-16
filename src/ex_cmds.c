@@ -14,6 +14,11 @@
 #include "vim.h"
 #include "version.h"
 
+#ifdef __COSMOPOLITAN__
+#define _COSMO_SOURCE
+#include "libc/dce.h"
+#endif
+
 #include <float.h>
 
 static int linelen(int *has_tab);
@@ -1150,6 +1155,28 @@ do_filter(
 	    emsg(_(e_cant_get_temp_file_name));
 	    goto filterend;
 	}
+
+#ifdef __COSMOPOLITAN__
+    if (IsWindows())
+    {
+        if (
+               (itmp[0] == '/')
+            && (('a' <= itmp[1] && itmp[1] <= 'z') || (('A' <= itmp[1] && itmp[1] <= 'Z')))
+        )
+        {
+            itmp[0] = itmp[1];
+            itmp[1] = ':';
+        }
+        if (
+               (otmp[0] == '/')
+            && (('a' <= otmp[1] && otmp[1] <= 'z') || (('A' <= otmp[1] && otmp[1] <= 'Z')))
+        )
+        {
+            otmp[0] = otmp[1];
+            otmp[1] = ':';
+        }
+    }
+#endif
 
 /*
  * The writing and reading of temp files will not be shown.
