@@ -5337,7 +5337,9 @@ vim_tempname(
 # endif
 
 #ifdef __COSMOPOLITAN__
-    tempdirs[0] = __get_tmpdir();
+    char *__get_tmpdir();
+    if (IsWindows())
+	tempdirs[0] = __get_tmpdir();
 #endif
     /*
      * This will create a directory for private use by this instance of Vim.
