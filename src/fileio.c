@@ -5330,10 +5330,7 @@ vim_tempname(
 
 #ifdef TEMPDIRNAMES
 #ifdef __COSMOPOLITAN__
-    if (IsWindows())
-	static char *(tempdirs[]) = {__get_tmpdir()};
-    else
-	static char *(tempdirs[]) = {TEMPDIRNAMES};
+    static char *(tempdirs[]) = {__get_tmpdir()};
 #else
     static char	*(tempdirs[]) = {TEMPDIRNAMES};
 #endif
